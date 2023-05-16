@@ -27,6 +27,15 @@ def get_sql():
       2
         """
 
+def items_func_with_result_all(bq_client, sql):
+    row_iter = bq_client.query(sql).result()
+    final = []
+    for i in row_iter:
+        temp = []
+        for j in i.items():
+            temp.append(j)
+        final.append(temp)
+    return final
 
 def items_func_with_result(bq_client, sql):
     row_iter = bq_client.query(sql).result()
@@ -145,6 +154,23 @@ class TestResults(unittest.TestCase):
         print(
             "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)
         )
+
+    def test_register_data_not_sure(self):
+        client = bigquery_mock.Client()
+        data = [
+            [('data1-test', 'found')],
+            ]
+        client.register_data(key = 'data1', data =data)
+        sql = """
+            /*
+            py-bigquery-mock-register: data1
+
+            */
+            SELECT 
+            f FROM Table
+            """
+        f = items_func_with_result_all(bq_client = client, sql = sql)
+        self.assertEqual(f, data)
         
 if __name__ == '__main__':
     unittest.main()

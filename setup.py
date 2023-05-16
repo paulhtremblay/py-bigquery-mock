@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='py-bigquery-mock',
-    version='0.1.9',    
+    version='0.2.0',    
     description='Mock BigQuery',
     url='https://github.com/paulhtremblay/py-bigquery-mock',
     author='Henry Tremblay',

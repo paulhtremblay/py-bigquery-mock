@@ -55,24 +55,44 @@ class Row():
     def keys(self, *args, **kwargs):
         return self.info.keys()
 
+def get_sql_key(query):
+    for line in query.split('\n'):
+        if 'py-bigquery-mock-register:' in line:
+            fields = line.split(':')
+            if len(fields) != 2:
+                raise InvalidData('hint  should be in format "py-bigquery-mock-register: key"')
+            return fields[1].strip()
+
 class Client:
 
-    def _test_valid_data(self):
-        if not isinstance(self.data, list):
-            raise InvalidData(f'{self.data} is not a list')
+    def _test_valid_data(self, data):
+        if not isinstance(data, list):
+            raise InvalidData(f'{data} is not a list')
         errors = []
-        for n, i in enumerate(self.data):
+        for n, i in enumerate(data):
             if not isinstance(i, list):
                 errors.append((n, i, 'not a list'))
         if len(errors) != 0:
             raise InvalidData(errors)
 
     def __init__(self, data = []):
+        self._test_valid_data(data)
         self.data = data
-        self._test_valid_data()
+        self.registered_data = {}
 
-    def query(self, *args, **kwargs):
-        return RowIterator(data = self.data)
+    def register_data(self, key, data):
+        self._test_valid_data(data)
+        self.registered_data[key] = data
+
+    def query(self, query, *args, **kwargs):
+        key = get_sql_key(query)
+        if key:
+            data = self.registered_data.get(key)
+            if not data:
+                raise InvalidData(f'{key} not found in registered_data')
+        else:
+            data = self.data
+        return RowIterator(data = data)
 
     def create_table(self, table):
         return table
