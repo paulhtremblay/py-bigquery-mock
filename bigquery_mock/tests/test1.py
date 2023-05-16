@@ -133,6 +133,18 @@ class TestResults(unittest.TestCase):
     def test_not_a_list_in_list_data_raises_InvalidData(self):
         data = [[('name', 'value',),], 1] 
         self.assertRaises(InvalidData, bigquery_mock.BigQueryMock, data = data)
+
+    def test_create_table_raises_error(self):
+        table_id = 'project.dataset_id.tabele_id'
+        schema = [
+            bigquery_mock.SchemaField("full_name", "STRING", mode="REQUIRED"),
+            bigquery_mock.SchemaField("age", "INTEGER", mode="REQUIRED"),
+        ]
+        client = bigquery_mock.BigQueryMock()
+        table = bigquery_mock.Table(table_id = table_id, schema=schema)
+        print(
+            "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)
+        )
         
 if __name__ == '__main__':
     unittest.main()
