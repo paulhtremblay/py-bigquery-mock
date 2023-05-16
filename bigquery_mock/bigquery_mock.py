@@ -55,7 +55,7 @@ class Row():
     def keys(self, *args, **kwargs):
         return self.info.keys()
 
-class BigQueryMock:
+class Client:
 
     def _test_valid_data(self):
         if not isinstance(self.data, list):
