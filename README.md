@@ -1,7 +1,7 @@
 # py-bigquery-mock
 pip install py-bigquery-mock
 
-```
+```python
 
 import bigquery_mock.bigquery_mock as Mock
 
