@@ -1,4 +1,4 @@
-import bigquery_mock.bigquery_mock as Mock
+import bigquery_mock.bigquery_mock 
 
 BIKESHARE_NAME_STATUS_ADDRESS = [   [   ('name', '10th & Red River'),
         ('status', 'active'),
@@ -8,13 +8,9 @@ BIKESHARE_NAME_STATUS_ADDRESS = [   [   ('name', '10th & Red River'),
         ('address', '1705 E 11th St')]]
 
 
-class Client(Mock.Client):
+class Client(bigquery_mock.bigquery_mock.Client):
 
     def __init__(self):
-        data = [
-                [('key', 'value')
-                    ]
-                ]
-        super().__init__(data)
+        super().__init__()
         self.register_data(key = 'bikeshare-name-status-address', data =BIKESHARE_NAME_STATUS_ADDRESS)
         
