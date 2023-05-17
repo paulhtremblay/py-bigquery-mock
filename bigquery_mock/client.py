@@ -1,12 +1,6 @@
-class InvalidData(Exception):
-    pass
-
-class SchemaField:
-
-    def __init__(self, name, field_type, mode = 'Nullable'):
-        self.field_type = field_type
-        self.name = name
-        self.mode = mode
+from  bigquery_mock.exceptions import InvalidData
+from  bigquery_mock.schema import SchemaField
+from bigquery_mock.table import Table
 
 class RowIterator:
 
@@ -100,19 +94,3 @@ class Client:
     def delete_table(self, table_id, not_found_ok=False):
         pass
 
-class Table:
-
-    def _get_table_info(self, table_id):
-        if not isinstance(table_id, str):
-            raise InvalidData('table id must be str')
-        fields = table_id.split('.')
-        if len(fields) != 3:
-            raise InvalidData('table id must be in format "project_id.dataset_id.table_id"')
-        self.project = fields[0]
-        self.dataset_id= fields[1]
-        self.table_id = fields[2]
-
-
-    def __init__(self, table_id, schema):
-        self._get_table_info(table_id)
-        self.schema = schema

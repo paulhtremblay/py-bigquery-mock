@@ -1,14 +1,13 @@
 import sys
 sys.path.append('.')
-
 import unittest
-import mock_bigquery
-assert False
+import bigquery_mock 
 
 #import bigquery_mock
 #from bigquery_mock import InvalidData
+from bigquery_mock.exceptions import InvalidData
 
-from google.cloud import bigquery
+#from google.cloud import bigquery
 DATA1= [
         [('name', 'State Capitol @ 14th & Colorado'),
         ('status', 'closed'),
@@ -95,26 +94,26 @@ def keys_func_with_key_with_result(bq_client, sql):
 class TestResults(unittest.TestCase):
 
     def test_items_first_result_returns_3_correct_name_values(self):
-        client = bigquery_mock.Client(data = DATA1)
+        client =  bigquery_mock.Client(data = DATA1)
         f = items_func_with_result(bq_client = client, sql = get_sql())
         self.assertTrue(f[0], ('name', 'State Capitol @ 14th & Colorado'))
         self.assertTrue(f[1], ('status', 'closed'))
         self.assertTrue(f[2], ('address', '206 W. 14th St.'))
 
     def test_items_first_result_not_using_result_method_returns_3_correct_name_values(self):
-        client = bigquery_mock.Client(data = DATA1)
+        client =  bigquery_mock.Client(data = DATA1)
         f = items_func_not_use_result(bq_client = client, sql = get_sql())
         self.assertTrue(f[0], ('name', 'State Capitol @ 14th & Colorado'))
         self.assertTrue(f[1], ('status', 'closed'))
         self.assertTrue(f[2], ('address', '206 W. 14th St.'))
 
     def test_items_no_values_returns_empty_list(self):
-        client = bigquery_mock.Client()
+        client =  bigquery_mock.Client()
         f = items_func_with_result(bq_client = client, sql = get_sql())
         self.assertEqual(f, [])
 
     def test_get_name_returns_2_correct_names(self):
-        client = bigquery_mock.Client(data = DATA1)
+        client =  bigquery_mock.Client(data = DATA1)
         f = get_func_no_key(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
         
@@ -157,7 +156,7 @@ class TestResults(unittest.TestCase):
             "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)
         )
 
-    def test_register_data_not_sure(self):
+    def test_register_data_reads_right_data(self):
         client = bigquery_mock.Client()
         data = [
             [('data1-test', 'found')],
