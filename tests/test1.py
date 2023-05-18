@@ -21,14 +21,12 @@ def get_sql():
 class TestResults(unittest.TestCase):
 
     def test_items_first_result_returns_3_correct_name_values(self):
-        client = bigquery.Client(project= 'sbgtv-data-platform-dev')
+        client = bigquery.Client(project= 'some-project')
         sql = get_sql() 
         row_iter = client.query(sql).result()
-        print(type(row_iter))
         self.assertEqual(row_iter.total_rows, 2)
         final = []
         for i in row_iter:
-            #self.assertTrue(isinstance(i, google.cloud.bigquery.table.Row) )
             temp = []
             for j in i.items():
                 self.assertTrue(isinstance(j, tuple))

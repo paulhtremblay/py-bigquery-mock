@@ -1,13 +1,12 @@
-from  bigquery_mock.exceptions import InvalidData
-from bigquery_mock.table import Table
-from bigquery_mock.table import RowIterator
-
+from . import exceptions
+from .  import table
 
 class Client:
 
-    def __init__(self, data = []):
+    def __init__(self, project = None, data = [] *args, **kwargs):
         self._test_valid_data(data)
         self.__data = data
+        self.project = project
         self.__registered_data = {}
 
     def register_data(self, key, data):
@@ -19,10 +18,10 @@ class Client:
         if key:
             data = self.__registered_data.get(key)
             if not data:
-                raise InvalidData(f'{key} not found in registered_data')
+                raise exceptions.InvalidData(f'{key} not found in registered_data')
         else:
             data = self.__data
-        return RowIterator(data = data)
+        return table.RowIterator(data = data)
 
     def create_table(self, table):
         return table
@@ -35,16 +34,16 @@ class Client:
             if 'py-bigquery-mock-register:' in line:
                 fields = line.split(':')
                 if len(fields) != 2:
-                    raise InvalidData('hint  should be in format "py-bigquery-mock-register: key"')
+                    raise exceptions.InvalidData('hint should be in format "py-bigquery-mock-register: key"')
                 return fields[1].strip()
 
     def _test_valid_data(self, data):
         if not isinstance(data, list):
-            raise InvalidData(f'{data} is not a list')
+            raise exceptions.InvalidData(f'{data} is not a list')
         errors = []
         for n, i in enumerate(data):
             if not isinstance(i, list):
                 errors.append((n, i, 'not a list'))
         if len(errors) != 0:
-            raise InvalidData(errors)
+            raise exceptions.InvalidData(errors)
 

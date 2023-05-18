@@ -1,4 +1,4 @@
-import bigquery_mock.bigquery_mock 
+import data_mock.google.cloud.client
 
 BIKESHARE_NAME_STATUS_ADDRESS = [   [   ('name', '10th & Red River'),
         ('status', 'active'),
@@ -8,7 +8,7 @@ BIKESHARE_NAME_STATUS_ADDRESS = [   [   ('name', '10th & Red River'),
         ('address', '1705 E 11th St')]]
 
 
-class Client(bigquery_mock.bigquery_mock.Client):
+class Client(data_mock.google.cloud.client.Client):
 
     def __init__(self):
         super().__init__()

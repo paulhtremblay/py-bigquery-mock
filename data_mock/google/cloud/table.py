@@ -1,4 +1,5 @@
-from  bigquery_mock.schema import SchemaField
+from . import schema
+
 class Table:
 
     def _get_table_info(self, table_id):
@@ -49,7 +50,7 @@ class RowIterator:
         self.__counter = 0
         self.total_rows = len(data)
         self.__data = data
-        self.schema = [SchemaField(name = 'todo', field_type='INTEGER')]
+        self.schema = [schema.SchemaField(name = 'todo', field_type='INTEGER')]
 
     def __iter__(self):
         return self
