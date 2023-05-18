@@ -10,7 +10,7 @@ BIKESHARE_NAME_STATUS_ADDRESS = [   [   ('name', '10th & Red River'),
 
 class Client(data_mock.google.cloud.client.Client):
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         super().__init__()
         self.register_data(key = 'bikeshare-name-status-address', data =BIKESHARE_NAME_STATUS_ADDRESS)
         

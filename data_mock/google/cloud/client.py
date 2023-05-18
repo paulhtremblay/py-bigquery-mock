@@ -3,7 +3,7 @@ from .  import table
 
 class Client:
 
-    def __init__(self, project = None, data = [] *args, **kwargs):
+    def __init__(self, project = None, data = [], *args, **kwargs):
         self._test_valid_data(data)
         self.__data = data
         self.project = project
