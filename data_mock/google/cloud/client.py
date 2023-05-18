@@ -3,15 +3,15 @@ from .  import table
 
 class Client:
 
-    def __init__(self, project = None, data = [], *args, **kwargs):
-        self._test_valid_data(data)
-        self.__data = data
+    def __init__(self, project = None, mock_data = [], *args, **kwargs):
+        self._test_valid_data(mock_data)
+        self.__data = mock_data
         self.project = project
         self.__registered_data = {}
 
-    def register_data(self, key, data):
-        self._test_valid_data(data)
-        self.__registered_data[key] = data
+    def register_mock_data(self, key, mock_data):
+        self._test_valid_data(mock_data)
+        self.__registered_data[key] = mock_data
 
     def query(self, query, *args, **kwargs):
         key = self._get_sql_key(query)

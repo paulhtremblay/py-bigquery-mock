@@ -93,14 +93,14 @@ def keys_func_with_key_with_result(bq_client, sql):
 class TestResults(unittest.TestCase):
 
     def test_items_first_result_returns_3_correct_name_values(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = items_func_with_result(bq_client = client, sql = get_sql())
         self.assertTrue(f[0], ('name', 'State Capitol @ 14th & Colorado'))
         self.assertTrue(f[1], ('status', 'closed'))
         self.assertTrue(f[2], ('address', '206 W. 14th St.'))
 
     def test_items_first_result_not_using_result_method_returns_3_correct_name_values(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = items_func_not_use_result(bq_client = client, sql = get_sql())
         self.assertTrue(f[0], ('name', 'State Capitol @ 14th & Colorado'))
         self.assertTrue(f[1], ('status', 'closed'))
@@ -112,36 +112,36 @@ class TestResults(unittest.TestCase):
         self.assertEqual(f, [])
 
     def test_get_name_returns_2_correct_names(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = get_func_no_key(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
         
     def test_get_name_with_key_word_arg_returns_2_correct_names(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = get_func_with_key(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
 
     def test_get_name_with_key_word_arg_and_result_method_returns_2_correct_names(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = get_func_with_key_with_result(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
 
     def test_values_returns_2_correct_values(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = values_func_with_key_with_result(bq_client = client, sql = get_sql())
         self.assertEqual(f[0], ('State Capitol @ 14th & Colorado', 'closed', '206 W. 14th St.'))
 
     def test_keys_returns_correct_keys_first_result(self):
-        client = data_mock.google.cloud.client.Client(data = DATA1)
+        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
         f = keys_func_with_key_with_result(bq_client = client, sql = get_sql())
         self.assertTrue(list(f[0]), ['name', 'status', 'address'])
 
     def test_not_a_list_data_raises_InvalidData(self):
-        self.assertRaises(data_mock.google.cloud.exceptions.InvalidData, data_mock.google.cloud.client.Client, data = 1)
+        self.assertRaises(data_mock.google.cloud.exceptions.InvalidData, data_mock.google.cloud.client.Client, mock_data = 1)
 
     def test_not_a_list_in_list_data_raises_InvalidData(self):
         data = [[('name', 'value',),], 1] 
-        self.assertRaises(data_mock.google.cloud.exceptions.InvalidData, data_mock.google.cloud.client.Client, data = data)
+        self.assertRaises(data_mock.google.cloud.exceptions.InvalidData, data_mock.google.cloud.client.Client, mock_data = data)
 
     def test_create_table_raises_error(self):
         table_id = 'project.dataset_id.tabele_id'
@@ -155,10 +155,10 @@ class TestResults(unittest.TestCase):
 
     def test_register_data_reads_right_data(self):
         client = data_mock.google.cloud.client.Client()
-        data = [
+        mock_data = [
             [('data1-test', 'found')],
             ]
-        client.register_data(key = 'data1', data =data)
+        client.register_mock_data(key = 'data1', mock_data =mock_data)
         sql = """
             /*
             py-bigquery-mock-register: data1
@@ -168,7 +168,7 @@ class TestResults(unittest.TestCase):
             f FROM Table
             """
         f = items_func_with_result_all(bq_client = client, sql = sql)
-        self.assertEqual(f, data)
+        self.assertEqual(f, mock_data)
         
 if __name__ == '__main__':
     unittest.main()

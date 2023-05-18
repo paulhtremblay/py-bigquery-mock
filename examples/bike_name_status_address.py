@@ -12,5 +12,5 @@ class Client(data_mock.google.cloud.client.Client):
 
     def __init__(self, *args, **kwargs):
         super().__init__()
-        self.register_data(key = 'bikeshare-name-status-address', data =BIKESHARE_NAME_STATUS_ADDRESS)
+        self.register_mock_data(key = 'bikeshare-name-status-address', mock_data =BIKESHARE_NAME_STATUS_ADDRESS)
         
