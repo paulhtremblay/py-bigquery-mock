@@ -1,63 +1,42 @@
 from  bigquery_mock.exceptions import InvalidData
-from  bigquery_mock.schema import SchemaField
 from bigquery_mock.table import Table
+from bigquery_mock.table import RowIterator
 
-class RowIterator:
-
-    def __init__(self, data):
-        self.counter = 0
-        self.total_rows = len(data)
-        self.data = data
-        self.schema = [SchemaField(name = 'todo', field_type='INTEGER')]
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.counter< self.total_rows:
-            self.counter += 1
-            return Row(row = self.data[self.counter -1])
-        else:
-            raise StopIteration
-
-    def result(self):
-        return self
-
-class Row():
-
-    def __init__(self, row):
-        self.info = {}
-        l = []
-        for i in row:
-            self.info[i[0]] = i[1]
-            l.append(i[1])
-        self._values = tuple(l)
-        self.row = row
-
-    def get(self, *args, **kwargs):
-        if args:
-            return self.info.get(args[0])
-        return self.info.get(kwargs['key'])
-
-    def items(self, *args, **kwargs):
-        for i in self.row:
-            yield i
-
-    def values(self, *args, **kwargs):
-        return self._values
-
-    def keys(self, *args, **kwargs):
-        return self.info.keys()
-
-def get_sql_key(query):
-    for line in query.split('\n'):
-        if 'py-bigquery-mock-register:' in line:
-            fields = line.split(':')
-            if len(fields) != 2:
-                raise InvalidData('hint  should be in format "py-bigquery-mock-register: key"')
-            return fields[1].strip()
 
 class Client:
+
+    def __init__(self, data = []):
+        self._test_valid_data(data)
+        self.__data = data
+        self.__registered_data = {}
+
+    def register_data(self, key, data):
+        self._test_valid_data(data)
+        self.__registered_data[key] = data
+
+    def query(self, query, *args, **kwargs):
+        key = self._get_sql_key(query)
+        if key:
+            data = self.__registered_data.get(key)
+            if not data:
+                raise InvalidData(f'{key} not found in registered_data')
+        else:
+            data = self.__data
+        return RowIterator(data = data)
+
+    def create_table(self, table):
+        return table
+
+    def delete_table(self, table_id, not_found_ok=False):
+        pass
+
+    def _get_sql_key(self, query):
+        for line in query.split('\n'):
+            if 'py-bigquery-mock-register:' in line:
+                fields = line.split(':')
+                if len(fields) != 2:
+                    raise InvalidData('hint  should be in format "py-bigquery-mock-register: key"')
+                return fields[1].strip()
 
     def _test_valid_data(self, data):
         if not isinstance(data, list):
@@ -68,29 +47,4 @@ class Client:
                 errors.append((n, i, 'not a list'))
         if len(errors) != 0:
             raise InvalidData(errors)
-
-    def __init__(self, data = []):
-        self._test_valid_data(data)
-        self.data = data
-        self.registered_data = {}
-
-    def register_data(self, key, data):
-        self._test_valid_data(data)
-        self.registered_data[key] = data
-
-    def query(self, query, *args, **kwargs):
-        key = get_sql_key(query)
-        if key:
-            data = self.registered_data.get(key)
-            if not data:
-                raise InvalidData(f'{key} not found in registered_data')
-        else:
-            data = self.data
-        return RowIterator(data = data)
-
-    def create_table(self, table):
-        return table
-
-    def delete_table(self, table_id, not_found_ok=False):
-        pass
 

@@ -21,9 +21,10 @@ def get_sql():
 class TestResults(unittest.TestCase):
 
     def test_items_first_result_returns_3_correct_name_values(self):
-        client = bigquery.Client()
+        client = bigquery.Client(project= 'sbgtv-data-platform-dev')
         sql = get_sql() 
         row_iter = client.query(sql).result()
+        print(type(row_iter))
         self.assertEqual(row_iter.total_rows, 2)
         final = []
         for i in row_iter:
