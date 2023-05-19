@@ -2,37 +2,39 @@ from . import schema
 
 class Table:
 
-    def _get_table_info(self, table_id):
-        try:
-            getattr(table_id, 'dataset_id')
-            self.project = table_id.project
-            self.dataset_id = table_id.dataset_id
-            self.table_id = table_id.table_id
-        except AttributeError:
-            if not isinstance(table_id, str):
-                raise InvalidData('table id must be str')
-            fields = table_id.split('.')
+    def _get_table_info(self, table_ref):
+        if hasattr(table_ref, 'dataset_ref'):
+            self.project = table_ref.dataset_ref.project
+            self.dataset_id = table_ref.dataset_ref.dataset_id
+            self.table_id = table_ref.table_id
+        elif not isinstance(table_ref, str):
+            raise InvalidMockData('table id must be <table_ref> or <str>')
+        else:
+            fields = table_ref.split('.')
             if len(fields) != 3:
                 raise InvalidData('table id must be in format "project_id.dataset_id.table_id"')
             self.project = fields[0]
             self.dataset_id= fields[1]
-            self.table_id = table_id
+            table_id = fields[2]
+            self.table_id = f'{self.project}.{self.dataset_id}.{table_id}'
 
-    def __init__(self, table_id, schema):
-        self._get_table_info(table_id)
+    def __init__(self, table_ref, schema = None):
+        self._get_table_info(table_ref)
         self.schema = schema
 
 
 class TimePartitioning:
 
-    def __init__(self, type_, field, *args, **kwargs):
+    def __init__(self, type_=None, field=None, 
+            expiration_ms=None, require_partition_filter=None):
         self.field = field
 
-class TimePartitioningType:
-    DAY = ''
 
-    def __init__(self, *args, **kwargs):
-        pass
+class TableReference:
+
+    def __init__(self, dataset_ref, table_id):
+        self.dataset_ref = dataset_ref
+        self.table_id = table_id
 
 
 class Row():
@@ -82,3 +84,18 @@ class RowIterator:
     def result(self):
         return self
 
+
+class TimePartitioningType:
+    """Specifies the type of time partitioning to perform."""
+
+    DAY = "DAY"
+    """str: Generates one partition per day."""
+
+    HOUR = "HOUR"
+    """str: Generates one partition per hour."""
+
+    MONTH = "MONTH"
+    """str: Generates one partition per month."""
+
+    YEAR = "YEAR"
+    """str: Generates one partition per year."""

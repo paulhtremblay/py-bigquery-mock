@@ -151,7 +151,7 @@ class TestResults(unittest.TestCase):
             SchemaField("age", "INTEGER", mode="REQUIRED"),
         ]
         client = Client()
-        table = Table(table_id = table_id, schema=schema)
+        table = Table(table_ref = table_id, schema=schema)
         s = "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)
 
     def test_register_data_reads_right_data(self):

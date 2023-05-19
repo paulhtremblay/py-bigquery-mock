@@ -5,3 +5,4 @@ from data_mock.google.cloud.bigquery.schema import SchemaField
 from data_mock.google.cloud.bigquery.dataset import DatasetReference
 from data_mock.google.cloud.bigquery.table import TimePartitioning
 from data_mock.google.cloud.bigquery.table import TimePartitioningType
+from data_mock.google.cloud.bigquery.table import TableReference

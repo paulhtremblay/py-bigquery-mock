@@ -24,6 +24,12 @@ class Client:
         return table.RowIterator(data = data)
 
     def create_table(self, table):
+        if not hasattr(table, 'dataset_id'):
+            raise exceptions.InvalidMockData(f'table obj not passsed')
+        if not hasattr(table, 'project'):
+            raise exceptions.InvalidMockData(f'table obj not passsed')
+        if not hasattr(table, 'schema'):
+            raise exceptions.InvalidMockData(f'table obj not passsed')
         return table
 
     def delete_table(self, table_id, not_found_ok=False):
