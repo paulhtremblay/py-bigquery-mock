@@ -2,10 +2,11 @@ import sys
 sys.path.append('.')
 import unittest
 
-import data_mock.google.cloud.client
-import data_mock.google.cloud.exceptions
-import data_mock.google.cloud.schema 
-import data_mock.google.cloud.table 
+from data_mock.google.cloud.bigquery import Client
+from data_mock.google.cloud.bigquery import InvalidMockData
+from data_mock.google.cloud.bigquery import Table
+from data_mock.google.cloud.bigquery import SchemaField
+
 
 DATA1= [
         [('name', 'State Capitol @ 14th & Colorado'),
@@ -93,68 +94,68 @@ def keys_func_with_key_with_result(bq_client, sql):
 class TestResults(unittest.TestCase):
 
     def test_items_first_result_returns_3_correct_name_values(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = items_func_with_result(bq_client = client, sql = get_sql())
         self.assertTrue(f[0], ('name', 'State Capitol @ 14th & Colorado'))
         self.assertTrue(f[1], ('status', 'closed'))
         self.assertTrue(f[2], ('address', '206 W. 14th St.'))
 
     def test_items_first_result_not_using_result_method_returns_3_correct_name_values(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = items_func_not_use_result(bq_client = client, sql = get_sql())
         self.assertTrue(f[0], ('name', 'State Capitol @ 14th & Colorado'))
         self.assertTrue(f[1], ('status', 'closed'))
         self.assertTrue(f[2], ('address', '206 W. 14th St.'))
 
     def test_items_no_values_returns_empty_list(self):
-        client = data_mock.google.cloud.client.Client()
+        client = Client()
         f = items_func_with_result(bq_client = client, sql = get_sql())
         self.assertEqual(f, [])
 
     def test_get_name_returns_2_correct_names(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = get_func_no_key(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
         
     def test_get_name_with_key_word_arg_returns_2_correct_names(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = get_func_with_key(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
 
     def test_get_name_with_key_word_arg_and_result_method_returns_2_correct_names(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = get_func_with_key_with_result(bq_client = client, sql = get_sql())
         self.assertEqual(f, ['State Capitol @ 14th & Colorado', 'Bullock Museum @ Congress & MLK'])
 
     def test_values_returns_2_correct_values(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = values_func_with_key_with_result(bq_client = client, sql = get_sql())
         self.assertEqual(f[0], ('State Capitol @ 14th & Colorado', 'closed', '206 W. 14th St.'))
 
     def test_keys_returns_correct_keys_first_result(self):
-        client = data_mock.google.cloud.client.Client(mock_data = DATA1)
+        client = Client(mock_data = DATA1)
         f = keys_func_with_key_with_result(bq_client = client, sql = get_sql())
         self.assertTrue(list(f[0]), ['name', 'status', 'address'])
 
     def test_not_a_list_data_raises_InvalidData(self):
-        self.assertRaises(data_mock.google.cloud.exceptions.InvalidData, data_mock.google.cloud.client.Client, mock_data = 1)
+        self.assertRaises(InvalidMockData, Client, mock_data = 1)
 
     def test_not_a_list_in_list_data_raises_InvalidData(self):
         data = [[('name', 'value',),], 1] 
-        self.assertRaises(data_mock.google.cloud.exceptions.InvalidData, data_mock.google.cloud.client.Client, mock_data = data)
+        self.assertRaises(InvalidMockData, Client, mock_data = data)
 
     def test_create_table_raises_error(self):
         table_id = 'project.dataset_id.tabele_id'
         schema = [
-            data_mock.google.cloud.schema.SchemaField("full_name", "STRING", mode="REQUIRED"),
-            data_mock.google.cloud.schema.SchemaField("age", "INTEGER", mode="REQUIRED"),
+            SchemaField("full_name", "STRING", mode="REQUIRED"),
+            SchemaField("age", "INTEGER", mode="REQUIRED"),
         ]
-        client = data_mock.google.cloud.client.Client()
-        table = data_mock.google.cloud.table.Table(table_id = table_id, schema=schema)
+        client = Client()
+        table = Table(table_id = table_id, schema=schema)
         s = "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)
 
     def test_register_data_reads_right_data(self):
-        client = data_mock.google.cloud.client.Client()
+        client = Client()
         mock_data = [
             [('data1-test', 'found')],
             ]

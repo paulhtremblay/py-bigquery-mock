@@ -3,9 +3,9 @@ pip install py-bigquery-mock
 
 ```python
 
-import data_mock.google.cloud.client
+from data_mock.google.cloud.bigquery import Client as Mock
 
-class Client(data_mock.google.cloud.client.Client):
+class Client(Mock):
 
     def __init__(self):
         mock_data = [
@@ -47,7 +47,7 @@ SQL="""
 """
 #now regiseter the data
     
-class Client(data_mock.google.cloud.client.Client):
+class Client(Mock):
 
     def __init__(self, *args, **kwargs):
         super().__init__()

@@ -20,9 +20,22 @@ def dir_path(string):
         raise argparse.ArgumentTypeError(f"bigquery-path:{string} is not a valid dir")
 
 def _get_bigquery_code():
-    return """import bigquery_mock.bigquery_mock as Mock
+    return """from data_mock.google.cloud.bigquery import Client as Mock_Client
+from data_mock.google.cloud.bigquery import DatasetReference as Mock_DatasetReference
+from data_mock.google.cloud.bigquery import Table as Mock_Table
+from data_mock.google.cloud.bigquery import SchemaField as Mock_SchemaField
 
-class Client(Mock.Client):
+
+class Client(Mock_Client):
+    pass
+
+class DatasetReference(Mock_DatasetReference):
+    pass
+
+class Table(Mock_Table):
+    pass
+
+class SchemaField(Mock_SchemaField):
     pass
 
 
