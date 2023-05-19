@@ -1,5 +1,15 @@
 from . import exceptions
-from .  import table
+from .  import table as _table
+from .job import query as job_query
+from . import retry as retries
+
+from typing import Union
+
+# these values do nothing
+DEFAULT_RETRY = None
+DEFAULT_TIMEOUT = None
+DEFAULT_JOB_RETRY = None
+TimeoutType = Union[float, None]
 
 class Client:
 
@@ -13,7 +23,19 @@ class Client:
         self._test_valid_data(mock_data)
         self.__registered_data[key] = mock_data
 
-    def query(self, query, *args, **kwargs):
+    def query(self, query,
+        job_config: job_query.QueryJobConfig = None,
+        job_id: str = None,
+        job_id_prefix: str = None,
+        location: str = None,
+        project: str = None,
+        retry: retries.Retry = DEFAULT_RETRY,
+        timeout: TimeoutType = DEFAULT_TIMEOUT,
+        job_retry: retries.Retry = DEFAULT_JOB_RETRY,
+              ):
+        """
+        all args ignored except query
+        """
         key = self._get_sql_key(query)
         if key:
             data = self.__registered_data.get(key)
@@ -21,18 +43,40 @@ class Client:
                 raise exceptions.InvalidMockData(f'{key} not found in registered_data')
         else:
             data = self.__data
-        return table.RowIterator(data = data)
+        return _table.RowIterator(data = data)
 
-    def create_table(self, table):
-        if not hasattr(table, 'dataset_id'):
-            raise exceptions.InvalidMockData(f'table obj not passsed')
-        if not hasattr(table, 'project'):
-            raise exceptions.InvalidMockData(f'table obj not passsed')
-        if not hasattr(table, 'schema'):
-            raise exceptions.InvalidMockData(f'table obj not passsed')
+    def create_table(self,
+            table: Union[str, _table.Table, _table.TableReference, _table.TableListItem],
+            exists_ok: bool = False,
+            retry: retries.Retry = DEFAULT_RETRY,
+            timeout: TimeoutType = DEFAULT_TIMEOUT,
+        ):
+        """
+        all args ignored
+        """
+
+        if  hasattr(table, 'dataset_id')\
+                and hasattr(table, 'project')\
+                and  hasattr(table, 'schema'):
+                    pass
+        else:
+            table_obj = _table.Table(table)
+            table = table_obj
+
+        def _create_table(table):
+            table.mock_tables.append(table)
+        _create_table(table)
         return table
 
-    def delete_table(self, table_id, not_found_ok=False):
+    def delete_table(self,
+            table: Union[_table.Table, _table.TableReference, _table.TableListItem, str],
+            retry: retries.Retry = DEFAULT_RETRY,
+            timeout: TimeoutType = DEFAULT_TIMEOUT,
+            not_found_ok: bool = False,
+        ):
+        """
+        all args ignored
+        """
         pass
 
     def _get_sql_key(self, query):

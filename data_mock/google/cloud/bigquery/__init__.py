@@ -6,3 +6,4 @@ from data_mock.google.cloud.bigquery.dataset import DatasetReference
 from data_mock.google.cloud.bigquery.table import TimePartitioning
 from data_mock.google.cloud.bigquery.table import TimePartitioningType
 from data_mock.google.cloud.bigquery.table import TableReference
+from data_mock.google.cloud.bigquery.job import QueryJobConfig

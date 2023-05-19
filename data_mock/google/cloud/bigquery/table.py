@@ -1,4 +1,5 @@
 from . import schema
+from . import exceptions as _exceptions
 
 class Table:
 
@@ -8,17 +9,18 @@ class Table:
             self.dataset_id = table_ref.dataset_ref.dataset_id
             self.table_id = table_ref.table_id
         elif not isinstance(table_ref, str):
-            raise InvalidMockData('table id must be <table_ref> or <str>')
+            raise _exceptions.InvalidMockData('table id must be <table_ref> or <str>')
         else:
             fields = table_ref.split('.')
             if len(fields) != 3:
-                raise InvalidData('table id must be in format "project_id.dataset_id.table_id"')
+                raise _exceptions.InvalidData('table id must be in format "project_id.dataset_id.table_id"')
             self.project = fields[0]
             self.dataset_id= fields[1]
             table_id = fields[2]
             self.table_id = f'{self.project}.{self.dataset_id}.{table_id}'
 
     def __init__(self, table_ref, schema = None):
+        self.mock_tables = []
         self._get_table_info(table_ref)
         self.schema = schema
 
@@ -99,3 +101,9 @@ class TimePartitioningType:
 
     YEAR = "YEAR"
     """str: Generates one partition per year."""
+
+class TableListItem(Table):
+
+    def __init__(self):
+        self.tables = []
+        super().__init__()

@@ -6,6 +6,7 @@ from data_mock.google.cloud.bigquery import Client
 from data_mock.google.cloud.bigquery import InvalidMockData
 from data_mock.google.cloud.bigquery import Table
 from data_mock.google.cloud.bigquery import SchemaField
+from data_mock.google.cloud.bigquery import QueryJobConfig
 
 
 DATA1= [
@@ -144,7 +145,7 @@ class TestResults(unittest.TestCase):
         data = [[('name', 'value',),], 1] 
         self.assertRaises(InvalidMockData, Client, mock_data = data)
 
-    def test_create_table_raises_error(self):
+    def test_create_table_succeeds(self):
         table_id = 'project.dataset_id.tabele_id'
         schema = [
             SchemaField("full_name", "STRING", mode="REQUIRED"),
@@ -152,7 +153,16 @@ class TestResults(unittest.TestCase):
         ]
         client = Client()
         table = Table(table_ref = table_id, schema=schema)
-        s = "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)
+        client.create_table(table)
+        self.assertTrue(hasattr(table, 'project') and hasattr(table, 'table_id') and hasattr(table, 'dataset_id'))
+        self.assertTrue(len(table.mock_tables) == 1)
+
+    def test_create_table_as_string_succeeds(self):
+        table_id = 'project.dataset_id.table_id'
+        client = Client()
+        table = client.create_table(table = table_id)
+        self.assertTrue(hasattr(table, 'project') and hasattr(table, 'table_id') and hasattr(table, 'dataset_id'))
+        self.assertTrue(len(table.mock_tables) == 1)
 
     def test_register_data_reads_right_data(self):
         client = Client()
@@ -170,6 +180,17 @@ class TestResults(unittest.TestCase):
             """
         f = items_func_with_result_all(bq_client = client, sql = sql)
         self.assertEqual(f, mock_data)
-        
+
+    def test_query_works_with_config(self):
+        job_config = QueryJobConfig(destination='mock-table-id')
+        client = Client(mock_data = DATA1)
+        sql = """
+    SELECT corpus
+    FROM `bigquery-public-data.samples.shakespeare`
+    GROUP BY corpus;
+"""
+
+        query_job = client.query(sql, job_config=job_config)  
+
 if __name__ == '__main__':
     unittest.main()
