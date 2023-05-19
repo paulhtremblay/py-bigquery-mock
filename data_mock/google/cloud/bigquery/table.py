@@ -20,7 +20,6 @@ class Table:
             self.table_id = f'{self.project}.{self.dataset_id}.{table_id}'
 
     def __init__(self, table_ref, schema = None):
-        self.mock_tables = []
         self._get_table_info(table_ref)
         self.schema = schema
 

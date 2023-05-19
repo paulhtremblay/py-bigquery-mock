@@ -7,3 +7,9 @@ class DatasetReference():
     def table(self, table_id, *args, **kwargs):
         self.table_id = table_id
         return self
+
+class Dataset:
+    pass
+
+class DatasetListItem:
+    pass

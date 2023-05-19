@@ -2,8 +2,9 @@ from . import exceptions
 from .  import table as _table
 from .job import query as job_query
 from . import retry as retries
+from . import dataset as _dataset
 
-from typing import Union
+from typing import Union, Optional
 
 # these values do nothing
 DEFAULT_RETRY = None
@@ -13,11 +14,13 @@ TimeoutType = Union[float, None]
 
 class Client:
 
-    def __init__(self, project = None, mock_data = [], *args, **kwargs):
+    def __init__(self, project = None, mock_data = [], 
+            mock_list_of_tables = None):
         self._test_valid_data(mock_data)
         self.__data = mock_data
         self.project = project
         self.__registered_data = {}
+        self.__list_of_tables = mock_list_of_tables
 
     def register_mock_data(self, key, mock_data):
         self._test_valid_data(mock_data)
@@ -63,9 +66,9 @@ class Client:
             table_obj = _table.Table(table)
             table = table_obj
 
-        def _create_table(table):
-            table.mock_tables.append(table)
-        _create_table(table)
+        if self.__list_of_tables == None:
+            self.__list_of_tables = []
+        self.__list_of_tables.append(table) 
         return table
 
     def delete_table(self,
@@ -77,7 +80,30 @@ class Client:
         """
         all args ignored
         """
-        pass
+        if self.__list_of_tables == None and not_found_ok == False:
+            raise exceptions.TableNotFound('table not found')
+        elif self.__list_of_tables == None and not_found_ok == True:
+            pass
+        else:
+            if hasattr(table, 'table_id'):
+                _id = table.table_id
+            else:
+                _id = table
+            for i in self.__list_of_tables:
+                if i.table_id == _id:
+                    self.__list_of_tables.remove(i)
+
+    def list_tables(self,
+         dataset: Union[_dataset.Dataset, _dataset.DatasetReference, _dataset.DatasetListItem, str],
+         max_results: Optional[int] = None,
+         page_token: str = None,
+         retry: retries.Retry = DEFAULT_RETRY,
+         timeout: TimeoutType = DEFAULT_TIMEOUT,
+                    page_size: Optional[int] = None):
+        if self.__list_of_tables == None:
+            return []
+        return self.__list_of_tables
+
 
     def _get_sql_key(self, query):
         for line in query.split('\n'):
